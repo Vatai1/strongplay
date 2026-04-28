@@ -224,7 +224,6 @@
 .ctaTitle {
   font-size: 1.2rem;
   color: var(--accent-pink);
-  text-shadow: var(--pixel-shadow-pink);
   margin-bottom: 1.5rem;
 }
 

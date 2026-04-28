@@ -21,13 +21,11 @@
 .logo {
   font-size: 1rem;
   color: var(--accent-green);
-  text-shadow: var(--pixel-shadow-green);
   letter-spacing: 1px;
-  transition: text-shadow 0.2s;
 }
 
 .logo:hover {
-  text-shadow: 0 0 10px var(--accent-green), 0 0 20px var(--accent-green);
+  text-shadow: 0 0 10px var(--accent-green);
 }
 
 .nav {
