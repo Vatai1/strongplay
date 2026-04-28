@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# StrongPlay
 
-## Getting Started
+Сайт игрового мультигеймерского сообщества **StrongPlay**.
 
-First, run the development server:
+Ретро-пиксельный дизайн с тёмной темой и неоновыми акцентами.
+
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![React](https://img.shields.io/badge/React-19-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+
+## Страницы
+
+| Маршрут | Описание |
+|---|---|
+| `/` | Главная — герой-секция, «О нас», список игр, CTA на YouTube |
+| `/teams` | Состав команд — карточки игроков, сгруппированные по играм |
+| `/gallery` | Галерея — сетка скриншотов с лайтбокс-просмотром |
+
+## Технологии
+
+- **Next.js 16** (App Router) + **React 19**
+- **TypeScript** (strict mode)
+- **CSS Modules** — пиксельный шрифт Press Start 2P, тёмная тема
+- **Docker** — multi-stage standalone build
+
+## Быстрый старт
+
+### Разработка
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Откройте [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Продакшн (локально)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+### Docker
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+docker compose up -d
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Сайт будет доступен на порту **3000**.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Структура проекта
 
-## Deploy on Vercel
+```
+app/
+  layout.tsx            # Корневой layout (Header + Footer)
+  page.tsx              # Главная страница
+  globals.css           # Глобальные стили и CSS-переменные
+  gallery/page.tsx      # Галерея
+  teams/page.tsx        # Состав команд
+components/             # React-компоненты (Header, Footer, TeamCard, GalleryGrid)
+data/                   # Статические данные (teams.ts, gallery.ts)
+public/                 # Статические файлы
+Dockerfile              # Multi-stage build для Docker
+docker-compose.yml      # Конфигурация Docker Compose
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Обновление контента
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Все данные хранятся в статических файлах:
+
+- **`data/teams.ts`** — список команд и игроков (ник, роль, аватар)
+- **`data/gallery.ts`** — список изображений для галереи
+
+Изображения размещайте в `public/images/` и обновляйте пути в файлах данных.
+
+## Скрипты
+
+```bash
+npm run dev       # Запуск dev-сервера
+npm run build     # Сборка для продакшна
+npm run start     # Запуск продакшн-сервера
+npm run lint      # Проверка ESLint
+```
+
+## Лицензия
+
+Все права защищены.
