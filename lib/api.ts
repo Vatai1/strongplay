@@ -23,6 +23,15 @@ interface ApiPageMeta {
   content: Record<string, unknown>;
 }
 
+interface ApiGame {
+  id: number;
+  name: string;
+  url: string;
+  logo: string;
+  visible: boolean;
+  order: number;
+}
+
 async function fetchApi<T>(path: string): Promise<T> {
   const res = await fetch(`${CRM_API}/api${path}`, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
@@ -53,4 +62,12 @@ export async function getPageMeta(slug: string): Promise<ApiPageMeta | null> {
   }
 }
 
-export type { ApiTeam, ApiGalleryImage, ApiPageMeta };
+export async function getVisibleGames(): Promise<ApiGame[]> {
+  try {
+    return await fetchApi<ApiGame[]>("/games/visible");
+  } catch {
+    return [];
+  }
+}
+
+export type { ApiTeam, ApiGalleryImage, ApiPageMeta, ApiGame };

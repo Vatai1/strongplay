@@ -39,6 +39,15 @@ model GalleryImage {
   order Int    @default(0)
 }
 
+model Game {
+  id      Int    @id @default(autoincrement())
+  name    String
+  url     String @default("")
+  logo    String @default("")
+  visible Boolean @default(true)
+  order   Int    @default(0)
+}
+
 model PageMeta {
   id          Int    @id @default(autoincrement())
   slug        String @unique

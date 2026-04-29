@@ -99,6 +99,17 @@ async function main() {
     });
   }
 
+  const existingGames = await prisma.game.count();
+  if (existingGames === 0) {
+    await prisma.game.createMany({
+      data: [
+        { name: "Counter-Strike 2", url: "https://store.steampowered.com/app/730/CounterStrike_2/", visible: true, order: 0 },
+        { name: "Dota 2", url: "https://store.steampowered.com/app/570/Dota_2/", visible: true, order: 1 },
+        { name: "Valorant", url: "https://playvalorant.com/", visible: true, order: 2 },
+      ],
+    });
+  }
+
   console.log("Seed completed.");
 }
 

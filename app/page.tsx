@@ -1,11 +1,10 @@
-import { getPageMeta } from "@/lib/api";
+import { getPageMeta, getVisibleGames } from "@/lib/api";
 import styles from "./page.module.css";
 
 export default async function Home() {
-  const page = await getPageMeta("home");
+  const [page, games] = await Promise.all([getPageMeta("home"), getVisibleGames()]);
   const content = (page?.content || {}) as Record<string, unknown>;
   const slogan = (content.slogan as string) || "Играем. Побеждаем. Вместе.";
-  const games = (content.games as string[]) || ["Counter-Strike 2", "Dota 2", "Valorant"];
   const aboutCards = (content.aboutCards as Array<{ icon: string; title: string; text: string }>) || [
     { icon: "01", title: "Мультигейминг", text: "Мы играем в разные жанры: FPS, MOBA, RPG и многое другое. Каждый найдёт себе команду по душе." },
     { icon: "02", title: "Турниры", text: "Регулярные внутренние и внешние турниры. Соревнуйся, прокачивай скилл и побеждай." },
@@ -60,7 +59,13 @@ export default async function Home() {
           <h2 className={styles.sectionTitle}>Наши игры</h2>
           <div className={styles.gamesList}>
             {games.map((game) => (
-              <div className={styles.gameTag} key={game}>{game}</div>
+              game.url ? (
+                <a key={game.id} href={game.url} target="_blank" rel="noopener noreferrer" className={styles.gameTag}>
+                  {game.name}
+                </a>
+              ) : (
+                <div key={game.id} className={styles.gameTag}>{game.name}</div>
+              )
             ))}
           </div>
         </div>

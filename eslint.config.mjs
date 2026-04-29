@@ -12,6 +12,12 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // CRM built files
+    "crm/dist/**",
+    "crm/node_modules/**",
+    "crm/client/**",
+    "crm/server/**",
+    "crm/prisma/**",
   ]),
 ]);
 

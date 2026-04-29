@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Teams from "./pages/Teams";
 import Players from "./pages/Players";
+import Games from "./pages/Games";
 import Gallery from "./pages/Gallery";
 import Settings from "./pages/Settings";
 import Layout from "./components/Layout";
@@ -52,6 +53,7 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/teams" element={<Teams />} />
         <Route path="/players" element={<Players />} />
+        <Route path="/games" element={<Games />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" />} />

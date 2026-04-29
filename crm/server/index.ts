@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import authRoutes from "./routes/auth";
 import teamsRoutes from "./routes/teams";
 import playersRoutes from "./routes/players";
+import gamesRoutes from "./routes/games";
 import galleryRoutes from "./routes/gallery";
 import pagesRoutes from "./routes/pages";
 
@@ -22,6 +23,7 @@ app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 app.use("/api/auth", authRoutes(prisma));
 app.use("/api/teams", teamsRoutes(prisma));
 app.use("/api/players", playersRoutes(prisma));
+app.use("/api/games", gamesRoutes(prisma));
 app.use("/api/gallery", galleryRoutes(prisma));
 app.use("/api/pages", pagesRoutes(prisma));
 

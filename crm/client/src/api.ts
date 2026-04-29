@@ -81,6 +81,16 @@ export const api = {
     unassign: (id: number) =>
       request(`/players/${id}/unassign`, { method: "POST" }),
   },
+  games: {
+    list: () =>
+      request<Array<{ id: number; name: string; url: string; logo: string; visible: boolean; order: number }>>("/games"),
+    create: (data: { name: string; url?: string; logo?: string; visible?: boolean; order?: number }) =>
+      request("/games", { method: "POST", body: JSON.stringify(data) }),
+    update: (id: number, data: { name?: string; url?: string; logo?: string; visible?: boolean; order?: number }) =>
+      request(`/games/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+    delete: (id: number) =>
+      request(`/games/${id}`, { method: "DELETE" }),
+  },
   gallery: {
     list: () =>
       request<Array<{ id: number; src: string; alt: string; title: string; order: number }>>("/gallery"),
