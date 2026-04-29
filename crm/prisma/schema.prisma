@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Team {
+  id      Int      @id @default(autoincrement())
+  game    String
+  logo    String   @default("")
+  order   Int      @default(0)
+  players Player[]
+}
+
+model Player {
+  id       Int    @id @default(autoincrement())
+  nickname String
+  role     String @default("")
+  avatar   String @default("")
+  teamId   Int?
+  team     Team?  @relation(fields: [teamId], references: [id], onDelete: SetNull)
+}
+
+model GalleryImage {
+  id    Int    @id @default(autoincrement())
+  src   String
+  alt   String @default("")
+  title String @default("")
+  order Int    @default(0)
+}
+
+model PageMeta {
+  id          Int    @id @default(autoincrement())
+  slug        String @unique
+  title       String @default("")
+  description String @default("")
+  content     Json   @default("{}")
+}

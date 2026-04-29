@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/crm/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -19,6 +20,10 @@
 
 # production
 /build
+/crm/dist
+
+# uploads
+/crm/uploads
 
 # misc
 .DS_Store
