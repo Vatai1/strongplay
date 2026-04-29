@@ -21,6 +21,9 @@ export default function Layout({ children, onLogout }: { children: React.ReactNo
           <NavLink to="/gallery" className={({ isActive }) => `crm-nav-link ${isActive ? "active" : ""}`}>
             Галерея
           </NavLink>
+          <NavLink to="/news" className={({ isActive }) => `crm-nav-link ${isActive ? "active" : ""}`}>
+            Новости
+          </NavLink>
           <NavLink to="/settings" className={({ isActive }) => `crm-nav-link ${isActive ? "active" : ""}`}>
             Настройки
           </NavLink>

@@ -1,8 +1,10 @@
-import { getPageMeta, getVisibleGames } from "@/lib/api";
+import Link from "next/link";
+import { getPageMeta, getVisibleGames, getPublishedNews } from "@/lib/api";
+import NewsCard from "@/components/NewsCard";
 import styles from "./page.module.css";
 
 export default async function Home() {
-  const [page, games] = await Promise.all([getPageMeta("home"), getVisibleGames()]);
+  const [page, games, news] = await Promise.all([getPageMeta("home"), getVisibleGames(), getPublishedNews()]);
   const content = (page?.content || {}) as Record<string, unknown>;
   const slogan = (content.slogan as string) || "Играем. Побеждаем. Вместе.";
   const aboutCards = (content.aboutCards as Array<{ icon: string; title: string; text: string }>) || [
@@ -70,6 +72,24 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {news.length > 0 && (
+        <section className={styles.news}>
+          <div className={styles.container}>
+            <h2 className={styles.sectionTitle}>Новости</h2>
+            <div className={styles.newsGrid}>
+              {news.slice(0, 3).map((post) => (
+                <NewsCard key={post.id} post={post} />
+              ))}
+            </div>
+            <div className={styles.newsMore}>
+              <Link href="/news" className={styles.btnSecondary}>
+                Все новости
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className={styles.cta}>
         <div className={styles.container}>

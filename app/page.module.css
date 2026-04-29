@@ -138,6 +138,7 @@
 
 .about,
 .games,
+.news,
 .cta {
   padding: 5rem 0;
 }
@@ -221,6 +222,21 @@
   border-bottom: 3px solid var(--accent-pink);
 }
 
+.news {
+  background: var(--bg-secondary);
+}
+
+.newsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.newsMore {
+  text-align: center;
+  margin-top: 3rem;
+}
+
 .ctaTitle {
   font-size: 1.2rem;
   color: var(--accent-pink);
@@ -255,5 +271,9 @@
 
   .ctaTitle {
     font-size: 0.9rem;
+  }
+
+  .newsGrid {
+    grid-template-columns: 1fr;
   }
 }

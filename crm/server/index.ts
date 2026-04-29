@@ -8,6 +8,7 @@ import playersRoutes from "./routes/players";
 import gamesRoutes from "./routes/games";
 import galleryRoutes from "./routes/gallery";
 import pagesRoutes from "./routes/pages";
+import newsRoutes from "./routes/news";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -26,6 +27,7 @@ app.use("/api/players", playersRoutes(prisma));
 app.use("/api/games", gamesRoutes(prisma));
 app.use("/api/gallery", galleryRoutes(prisma));
 app.use("/api/pages", pagesRoutes(prisma));
+app.use("/api/news", newsRoutes(prisma));
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });

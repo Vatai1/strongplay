@@ -162,4 +162,110 @@ export const api = {
     update: (slug: string, data: { title: string; description: string; content: Record<string, unknown> }) =>
       request(`/pages/${slug}`, { method: "PUT", body: JSON.stringify(data) }),
   },
+  news: {
+    list: () =>
+      request<Array<{ id: number; title: string; summary: string; content: string; image: string; published: boolean; createdAt: string; updatedAt: string }>>("/news"),
+    create: (data: FormData, onProgress?: (percent: number, speed: string) => void) => {
+      return new Promise<{ id: number; title: string; summary: string; content: string; image: string; published: boolean; createdAt: string; updatedAt: string }>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const token = getToken();
+        const startTime = Date.now();
+
+        xhr.upload.addEventListener("progress", (e) => {
+          if (!e.lengthComputable || !onProgress) return;
+          const percent = Math.round((e.loaded / e.total) * 100);
+          const elapsed = (Date.now() - startTime) / 1000;
+          const speedBps = e.loaded / elapsed;
+          const speed = speedBps > 1048576
+            ? `${(speedBps / 1048576).toFixed(1)} МБ/с`
+            : speedBps > 1024
+              ? `${(speedBps / 1024).toFixed(1)} КБ/с`
+              : `${Math.round(speedBps)} Б/с`;
+          onProgress(percent, speed);
+        });
+
+        xhr.addEventListener("load", () => {
+          if (xhr.status === 401) {
+            clearToken();
+            window.location.href = "/login";
+            reject(new Error("Не авторизован"));
+            return;
+          }
+          if (xhr.status < 200 || xhr.status >= 300) {
+            try {
+              const d = JSON.parse(xhr.responseText);
+              reject(new Error(d.error || "Ошибка загрузки"));
+            } catch {
+              reject(new Error("Ошибка загрузки"));
+            }
+            return;
+          }
+          try {
+            resolve(JSON.parse(xhr.responseText));
+          } catch {
+            reject(new Error("Ошибка парсинга ответа"));
+          }
+        });
+
+        xhr.addEventListener("error", () => reject(new Error("Сетевая ошибка")));
+        xhr.addEventListener("abort", () => reject(new Error("Загрузка отменена")));
+
+        xhr.open("POST", `${API_BASE}/news`);
+        if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+        xhr.send(data);
+      });
+    },
+    update: (id: number, data: FormData, onProgress?: (percent: number, speed: string) => void) => {
+      return new Promise<{ id: number; title: string; summary: string; content: string; image: string; published: boolean; createdAt: string; updatedAt: string }>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const token = getToken();
+        const startTime = Date.now();
+
+        xhr.upload.addEventListener("progress", (e) => {
+          if (!e.lengthComputable || !onProgress) return;
+          const percent = Math.round((e.loaded / e.total) * 100);
+          const elapsed = (Date.now() - startTime) / 1000;
+          const speedBps = e.loaded / elapsed;
+          const speed = speedBps > 1048576
+            ? `${(speedBps / 1048576).toFixed(1)} МБ/с`
+            : speedBps > 1024
+              ? `${(speedBps / 1024).toFixed(1)} КБ/с`
+              : `${Math.round(speedBps)} Б/с`;
+          onProgress(percent, speed);
+        });
+
+        xhr.addEventListener("load", () => {
+          if (xhr.status === 401) {
+            clearToken();
+            window.location.href = "/login";
+            reject(new Error("Не авторизован"));
+            return;
+          }
+          if (xhr.status < 200 || xhr.status >= 300) {
+            try {
+              const d = JSON.parse(xhr.responseText);
+              reject(new Error(d.error || "Ошибка сохранения"));
+            } catch {
+              reject(new Error("Ошибка сохранения"));
+            }
+            return;
+          }
+          try {
+            resolve(JSON.parse(xhr.responseText));
+          } catch {
+            reject(new Error("Ошибка парсинга ответа"));
+          }
+        });
+
+        xhr.addEventListener("error", () => reject(new Error("Сетевая ошибка")));
+        xhr.addEventListener("abort", () => reject(new Error("Загрузка отменена")));
+
+        xhr.open("PUT", `${API_BASE}/news/${id}`);
+        if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+        xhr.send(data);
+      });
+    },
+    delete: (id: number) =>
+      request(`/news/${id}`, { method: "DELETE" }),
+  },
 };

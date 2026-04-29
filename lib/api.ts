@@ -32,6 +32,17 @@ interface ApiGame {
   order: number;
 }
 
+interface ApiNewsPost {
+  id: number;
+  title: string;
+  summary: string;
+  content: string;
+  image: string;
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 async function fetchApi<T>(path: string): Promise<T> {
   const res = await fetch(`${CRM_API}/api${path}`, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
@@ -70,4 +81,20 @@ export async function getVisibleGames(): Promise<ApiGame[]> {
   }
 }
 
-export type { ApiTeam, ApiGalleryImage, ApiPageMeta, ApiGame };
+export async function getPublishedNews(): Promise<ApiNewsPost[]> {
+  try {
+    return await fetchApi<ApiNewsPost[]>("/news/published");
+  } catch {
+    return [];
+  }
+}
+
+export async function getNewsPost(id: number): Promise<ApiNewsPost | null> {
+  try {
+    return await fetchApi<ApiNewsPost>(`/news/${id}`);
+  } catch {
+    return null;
+  }
+}
+
+export type { ApiTeam, ApiGalleryImage, ApiPageMeta, ApiGame, ApiNewsPost };

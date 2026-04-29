@@ -110,6 +110,32 @@ async function main() {
     });
   }
 
+  const existingNews = await prisma.newsPost.count();
+  if (existingNews === 0) {
+    await prisma.newsPost.createMany({
+      data: [
+        {
+          title: "StrongPlay открывает набор в команду по CS2",
+          summary: "Ищем талантливых игроков для участия в турнирах. Запись открыта до конца месяца.",
+          content: "Мы начинаем набор в новую команду по Counter-Strike 2. Если у тебя есть опыт в соревновательном CS2 и ты хочешь развиваться вместе с нами — подавай заявку!",
+          published: true,
+        },
+        {
+          title: "Победа на турнире Dota 2 Pro Cup",
+          summary: "Наша команда заняла первое место на турнире Dota 2 Pro Cup 2026.",
+          content: "Поздравляем нашу команду с убедительной победой! Финальная серия завершилась со счётом 3:1.",
+          published: true,
+        },
+        {
+          title: "Стрим-марафон в честь юбилея сообщества",
+          summary: "12 часов нон-стоп стрима, розыгрыши и специальные гости.",
+          content: "Отмечаем годовщину StrongPlay большим стрим-марафоном. Join us!",
+          published: true,
+        },
+      ],
+    });
+  }
+
   console.log("Seed completed.");
 }
 

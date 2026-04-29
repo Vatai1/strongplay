@@ -34,6 +34,9 @@ export default function Header() {
           <Link href="/gallery" className={styles.link} onClick={() => setMenuOpen(false)}>
             Галерея
           </Link>
+          <Link href="/news" className={styles.link} onClick={() => setMenuOpen(false)}>
+            Новости
+          </Link>
           <a
             href="https://youtube.com"
             target="_blank"

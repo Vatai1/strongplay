@@ -6,6 +6,7 @@ import Teams from "./pages/Teams";
 import Players from "./pages/Players";
 import Games from "./pages/Games";
 import Gallery from "./pages/Gallery";
+import News from "./pages/News";
 import Settings from "./pages/Settings";
 import Layout from "./components/Layout";
 import { isAuthenticated, api, setToken, clearToken } from "./api";
@@ -55,6 +56,7 @@ export default function App() {
         <Route path="/players" element={<Players />} />
         <Route path="/games" element={<Games />} />
         <Route path="/gallery" element={<Gallery />} />
+        <Route path="/news" element={<News />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
