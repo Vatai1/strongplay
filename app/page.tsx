@@ -1,6 +1,17 @@
+import { getPageMeta } from "@/lib/api";
 import styles from "./page.module.css";
 
-export default function Home() {
+export default async function Home() {
+  const page = await getPageMeta("home");
+  const content = (page?.content || {}) as Record<string, unknown>;
+  const slogan = (content.slogan as string) || "Играем. Побеждаем. Вместе.";
+  const games = (content.games as string[]) || ["Counter-Strike 2", "Dota 2", "Valorant"];
+  const aboutCards = (content.aboutCards as Array<{ icon: string; title: string; text: string }>) || [
+    { icon: "01", title: "Мультигейминг", text: "Мы играем в разные жанры: FPS, MOBA, RPG и многое другое. Каждый найдёт себе команду по душе." },
+    { icon: "02", title: "Турниры", text: "Регулярные внутренние и внешние турниры. Соревнуйся, прокачивай скилл и побеждай." },
+    { icon: "03", title: "Сообщество", text: "Дружелюбная атмосфера, опытные игроки и активный контент на YouTube." },
+  ];
+
   return (
     <div className={styles.page}>
       <section className={styles.hero}>
@@ -11,7 +22,7 @@ export default function Home() {
             StrongPlay
             <span className={styles.titleAccent}>/&gt;</span>
           </h1>
-          <p className={styles.subtitle}>Играем. Побеждаем. Вместе.</p>
+          <p className={styles.subtitle}>{slogan}</p>
           <div className={styles.heroActions}>
             <a href="/teams" className={styles.btnPrimary}>
               Наши команды
@@ -33,30 +44,13 @@ export default function Home() {
         <div className={styles.container}>
           <h2 className={styles.sectionTitle}>О нас</h2>
           <div className={styles.aboutGrid}>
-            <div className={styles.aboutCard}>
-              <span className={styles.aboutIcon}>01</span>
-              <h3 className={styles.aboutCardTitle}>Мультигейминг</h3>
-              <p className={styles.aboutText}>
-                Мы играем в разные жанры: FPS, MOBA, RPG и многое другое.
-                Каждый найдёт себе команду по душе.
-              </p>
-            </div>
-            <div className={styles.aboutCard}>
-              <span className={styles.aboutIcon}>02</span>
-              <h3 className={styles.aboutCardTitle}>Турниры</h3>
-              <p className={styles.aboutText}>
-                Регулярные внутренние и внешние турниры.
-                Соревнуйся, прокачивай скилл и побеждай.
-              </p>
-            </div>
-            <div className={styles.aboutCard}>
-              <span className={styles.aboutIcon}>03</span>
-              <h3 className={styles.aboutCardTitle}>Сообщество</h3>
-              <p className={styles.aboutText}>
-                Дружелюбная атмосфера, опытные игроки и активный
-                контент на YouTube.
-              </p>
-            </div>
+            {aboutCards.map((card) => (
+              <div className={styles.aboutCard} key={card.icon}>
+                <span className={styles.aboutIcon}>{card.icon}</span>
+                <h3 className={styles.aboutCardTitle}>{card.title}</h3>
+                <p className={styles.aboutText}>{card.text}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -65,10 +59,9 @@ export default function Home() {
         <div className={styles.container}>
           <h2 className={styles.sectionTitle}>Наши игры</h2>
           <div className={styles.gamesList}>
-            <div className={styles.gameTag}>Counter-Strike 2</div>
-            <div className={styles.gameTag}>Dota 2</div>
-            <div className={styles.gameTag}>Valorant</div>
-            <div className={styles.gameTag}>И другие...</div>
+            {games.map((game) => (
+              <div className={styles.gameTag} key={game}>{game}</div>
+            ))}
           </div>
         </div>
       </section>
@@ -89,7 +82,6 @@ export default function Home() {
           </a>
         </div>
       </section>
-
     </div>
   );
 }

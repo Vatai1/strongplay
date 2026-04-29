@@ -1,13 +1,18 @@
-import { teams } from "@/data/teams";
+import { getTeams, getPageMeta } from "@/lib/api";
 import TeamCard from "@/components/TeamCard";
 import styles from "./teams.module.css";
 
-export const metadata = {
-  title: "Команды — StrongPlay",
-  description: "Состав игровых команд StrongPlay",
-};
+export async function generateMetadata() {
+  const page = await getPageMeta("teams");
+  return {
+    title: page?.title || "Команды — StrongPlay",
+    description: page?.description || "Состав игровых команд StrongPlay",
+  };
+}
 
-export default function TeamsPage() {
+export default async function TeamsPage() {
+  const teams = await getTeams();
+
   return (
     <div className={styles.page}>
       <div className={styles.container}>
@@ -18,14 +23,14 @@ export default function TeamsPage() {
 
         <div className={styles.teamsList}>
           {teams.map((team, index) => (
-            <section key={index} className={styles.teamSection}>
+            <section key={team.id} className={styles.teamSection}>
               <h2 className={styles.gameTitle}>
                 <span className={styles.gameIndex}>{String(index + 1).padStart(2, "0")}</span>
                 {team.game}
               </h2>
               <div className={styles.playersGrid}>
-                {team.players.map((player, pIndex) => (
-                  <TeamCard key={pIndex} player={player} />
+                {team.players.map((player) => (
+                  <TeamCard key={player.id} player={{ nickname: player.nickname, role: player.role, avatar: player.avatar }} />
                 ))}
               </div>
             </section>

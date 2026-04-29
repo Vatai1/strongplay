@@ -1,6 +1,40 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: strongplay
+      POSTGRES_PASSWORD: strongplay_db_pass
+      POSTGRES_DB: strongplay
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  crm:
+    build: ../strong-play-crm
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://strongplay:strongplay_db_pass@postgres:5432/strongplay
+      JWT_SECRET: change-this-to-a-random-secret
+      PORT: 3001
+    depends_on:
+      - postgres
+    volumes:
+      - uploads:/app/uploads
+    restart: unless-stopped
+
   web:
     build: .
     ports:
       - "3000:3000"
+    environment:
+      CRM_API_URL: http://crm:3001
+    depends_on:
+      - crm
     restart: unless-stopped
+
+volumes:
+  pgdata:
+  uploads:
