@@ -6,132 +6,147 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # StrongPlay — AGENTS.md
 
-Gaming community website built with Next.js 16 (App Router), React 19, TypeScript, CSS Modules.
-UI language is **Russian**. Retro pixel-art dark theme with neon accents.
+Monorepo: gaming community website + CRM admin panel. UI language is **Russian**. Retro pixel-art dark theme.
+
+## Monorepo Layout
+
+```
+strong-play/                 # Root — Next.js 16 site (port 3000)
+  app/                       # Pages (App Router)
+  components/                # Shared React components
+  lib/api.ts                 # Fetch client → CRM API
+  data/                      # Legacy static data (kept as fallback)
+  crm/                       # CRM admin panel (port 3001)
+    server/                  # Express 5 API + Prisma ORM
+    client/src/              # React SPA (Vite)
+    prisma/                  # Schema, migrations, seed
+  docker-compose.yml         # postgres + crm + web
+  start.sh                   # Unified management script
+```
 
 ## Commands
 
+### Main site (run from repo root)
+
 ```bash
-npm run dev       # Development server (http://localhost:3000)
-npm run build     # Production build (Turbopack)
-npm run lint      # ESLint (flat config, core-web-vitals + TypeScript)
-npm run start     # Start production server (after build)
+npm run dev        # Dev server → http://localhost:3000
+npm run build      # Production build (Turbopack)
+npm run lint       # ESLint (flat config, core-web-vitals + TS)
+npm run start      # Start production server
 ```
 
-There is **no test framework** configured. No test commands exist.
+### CRM (run from `crm/`)
 
-## Project Structure
-
-```
-app/
-  layout.tsx            # Root layout: Header + Footer wrapper
-  page.tsx              # Home page (/)
-  globals.css           # Global CSS variables and resets
-  page.module.css       # Home page styles
-  gallery/page.tsx      # Gallery page (/gallery)
-  teams/page.tsx        # Teams page (/teams)
-components/             # Shared React components (one .tsx + one .module.css each)
-data/                   # Static TypeScript data modules (teams.ts, gallery.ts)
-public/                 # Static assets served at /
-Dockerfile              # Multi-stage standalone build
-docker-compose.yml      # Single-service deployment on port 3000
+```bash
+npm run dev          # Dev server + client concurrently → http://localhost:3001
+npm run dev:server   # Server only (tsx watch)
+npm run dev:client   # Client only (Vite dev)
+npm run build        # Build client + server
+npm run build:client # Vite build → dist/client
+npm run build:server # tsc build → dist/server
+npm run db:migrate   # Run Prisma migrations
+npm run db:generate  # Generate Prisma client
+npm run db:seed      # Seed DB with initial data
 ```
 
-## Build & Deploy
+### Docker (run from repo root)
 
-- `next.config.ts` sets `output: "standalone"` for Docker deployment.
-- Docker: `docker compose up -d` → port 3000.
-- Always run `npm run build` and `npm run lint` after making changes. Both must pass with zero errors.
-
-## Code Style Guidelines
-
-### Imports
-
-Order (separated by blank lines):
-
-1. `"use client"` directive — **always first line** if the component uses hooks or event handlers
-2. External packages (`next/link`, `react`, etc.)
-3. Internal modules using `@/` alias (`@/data/...`, `@/components/...`)
-4. Type-only imports use `import type { X }` syntax
-5. CSS Module import — **always last**: `import styles from "./ComponentName.module.css"`
-
-```tsx
-"use client";
-
-import Link from "next/link";
-import { useState } from "react";
-import { GalleryImage } from "@/data/gallery";
-import styles from "./GalleryGrid.module.css";
+```bash
+./start.sh setup     # First-time install
+./start.sh start     # Start all services (postgres + crm + web)
+./start.sh dev       # Dev mode with hot reload
+./start.sh stop      # Stop all services
+./start.sh rebuild   # Full rebuild without cache
 ```
+
+There is **no test framework** in either project.
+
+## Build Verification
+
+After ANY change, run the appropriate commands and ensure zero errors:
+
+- Main site: `npm run build && npm run lint`
+- CRM server: `cd crm && npm run build:server`
+- CRM client: `cd crm && npm run build:client`
+
+## Code Style — Main Site (Next.js)
+
+### Imports (ordered, blank-line separated)
+
+1. `"use client"` — first line if component uses hooks/events
+2. External packages (`next/link`, `react`)
+3. Internal via `@/` alias (`@/lib/api`, `@/components/...`)
+4. Type-only: `import type { X }`
+5. CSS Module — **always last**: `import styles from "./X.module.css"`
 
 ### Components
 
-- **File naming**: PascalCase (`Header.tsx`, `TeamCard.tsx`)
-- **Function naming**: PascalCase, matching filename (`export default function Header()`)
-- **Export style**: Always `export default function` — no named exports for components, no arrow functions
-- **"use client"**: Only when the component needs hooks or browser APIs. Pure presentational components are server components.
-- **Props**: Typed inline with anonymous object types — no separate interfaces or type aliases for props:
-  ```tsx
-  export default function TeamCard({ player }: { player: Player }) { ... }
-  ```
-- **No `React.FC`** — use plain function declarations
+- Files: PascalCase (`TeamCard.tsx`) with co-located `.module.css`
+- Export: always `export default function Name()` — no arrow functions, no `React.FC`
+- `"use client"`: only when hooks or browser APIs are needed
+- Props: inline typed (`({ player }: { player: Player })`) — no separate type aliases for props
 
 ### Pages
 
-- Each page exports `default function PageName()`
-- Page naming: `Home`, `TeamsPage`, `GalleryPage`
-- Pages can export `const metadata = { title, description }` for SEO
-- Wrap content in `<div className={styles.page}>` → `<div className={styles.container}>`
+- Async server components fetch data from CRM API via `lib/api.ts`
+- Export `generateMetadata()` for dynamic SEO (not static `metadata` object)
+- Wrap: `<div className={styles.page}>` → `<div className={styles.container}>`
 
 ### CSS Modules
 
-- One `.module.css` file per component/page, co-located in the same directory
-- Import as `import styles from "./ComponentName.module.css"`
-- Apply via `className={styles.className}`
-- Conditional classes: `className={\`${styles.foo} ${condition ? styles.bar : ""}\`}`
-- **Class naming**: camelCase (`heroContent`, `btnPrimary`, `lightboxClose`) — never kebab-case or snake_case
-- Use CSS variables from `globals.css` (`var(--accent-green)`, `var(--bg-card)`, etc.)
-- Responsive breakpoints: `@media (max-width: 768px)` at the bottom of each file
-- Pixel theme: hard shadows (`4px 4px 0px`), solid borders (no border-radius), `var(--font-pixel)`
+- One `.module.css` per component/page, co-located
+- Class names: **camelCase** (`heroContent`, `btnPrimary`) — never kebab-case
+- Use CSS variables from `globals.css` — `var(--accent-green)`, `var(--bg-card)`, etc.
+- Pixel theme: hard shadows (`4px 4px 0px`), **no border-radius**, `var(--font-pixel)`
+- Responsive: `@media (max-width: 768px)` at bottom of each file
 
-### Global CSS Variables (defined in `app/globals.css`)
+### Data Flow
 
-| Variable | Purpose |
-|---|---|
-| `--bg-primary`, `--bg-secondary`, `--bg-card` | Background layers |
-| `--text-primary`, `--text-secondary` | Text colors |
-| `--accent-green`, `--accent-pink`, `--accent-cyan` | Neon accent colors |
-| `--pixel-shadow-green`, `--pixel-shadow-pink` | Hard pixel shadows |
-| `--font-pixel` | Press Start 2P font family |
+- Pages fetch from CRM API (`lib/api.ts`) with `next: { revalidate: 60 }` for ISR
+- API fallbacks return empty arrays/null on failure
 
-### Data Files (`data/`)
+## Code Style — CRM (Express + React)
 
-- Export **interfaces** (PascalCase) and **typed const arrays** (camelCase)
-- Named exports only — no default exports
-- Static/hardcoded data, no API calls or async fetching
-- True constants use SCREAMING_SNAKE_CASE (`GALLERY_SLOTS`)
+### Server (`crm/server/`)
 
-```ts
-export interface Player { nickname: string; role: string; avatar: string; }
-export const teams: Team[] = [ ... ];
-```
+- Express 5 route functions: `export default function nameRoutes(prisma: PrismaClient)`
+- Route pattern: `router.get("/:id", async (req: Request, res: Response) => { ... })`
+- Auth-protected routes use `authMiddleware` and `AuthRequest` type
+- Params: cast `req.params.slug as string` (Express 5 types params as `string | string[]`)
+- Errors: return `{ error: "message" }` with appropriate status code
+- No comments unless explicitly asked
 
-### TypeScript
+### Prisma (`crm/prisma/`)
 
-- Strict mode enabled (`strict: true` in tsconfig)
-- No `any` types — type everything explicitly
-- Path alias: `@/*` → project root
-- `moduleResolution: "bundler"` with `isolatedModules: true`
+- Schema: PascalCase models, camelCase fields
+- Nullable foreign keys for optional relations (`teamId Int?`)
+- `onDelete: SetNull` for soft disconnects, `Cascade` only where appropriate
+- Migrations: `npx prisma migrate dev --name descriptive_name`
+- Seed: `crm/prisma/seed.ts` — idempotent with `count()` checks
 
-### Error Handling
+### CRM Client (`crm/client/src/`)
 
-- No error boundary (`error.tsx`) or `not-found.tsx` files exist yet
-- No API routes — purely static/client-side
+- Pages: one file per page in `pages/`, PascalCase (`Players.tsx`)
+- API client: `api.ts` — all endpoints typed, uses `request<T>()` helper
+- File upload: XMLHttpRequest for progress events (not fetch)
+- State: `useState` for modals, forms, confirm dialogs
+- ConfirmModal component for all destructive actions
+- No CSS Modules — uses global `index.css` with `crm-` prefixed utility classes
+- Same pixel theme as main site (same CSS variables)
 
-### Things to Avoid
+## TypeScript
 
-- Do NOT add Tailwind CSS — this project uses CSS Modules exclusively
-- Do NOT add `border-radius` — the design is pixel-art with sharp corners
-- Do NOT use `<a>` for internal navigation — use `<Link />` from `next/link` (ESLint enforces this)
-- Do NOT add comments in code unless explicitly asked
-- Do NOT install new dependencies without checking what's already available
+- Strict mode everywhere (`strict: true`)
+- No `any` — type everything explicitly
+- Main site: `@/*` path alias → repo root
+- CRM server: CommonJS modules, `moduleResolution: "node"`
+- CRM client: ESNext modules, `moduleResolution: "bundler"`
+
+## Things to Avoid
+
+- Do NOT add Tailwind CSS — CSS Modules (main site) and global CSS (CRM) only
+- Do NOT add `border-radius` — pixel-art design uses sharp corners
+- Do NOT use `<a>` for internal navigation — `<Link />` from `next/link`
+- Do NOT add comments unless explicitly asked
+- Do NOT install dependencies without checking existing ones
+- Do NOT use `*` wildcard in Express 5 routes — use `{*splat}` instead
